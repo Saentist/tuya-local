@@ -1,4 +1,5 @@
 """Tests for the switch entity."""
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.components.switch import SwitchDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
@@ -9,6 +10,7 @@ from homeassistant.const import (
 )
 
 from ..const import KOGAN_SOCKET_PAYLOAD
+from ..mixins.binary_sensor import BasicBinarySensorTests
 from ..mixins.number import BasicNumberTests
 from ..mixins.sensor import MultiSensorTests
 from ..mixins.switch import SwitchableTests
@@ -19,10 +21,15 @@ TIMER_DPS = "2"
 CURRENT_DPS = "4"
 POWER_DPS = "5"
 VOLTAGE_DPS = "6"
+OVERCURRENT_DPS = "7"
 
 
 class TestKoganSwitch(
-    BasicNumberTests, MultiSensorTests, SwitchableTests, TuyaDeviceTestCase
+    BasicBinarySensorTests,
+    BasicNumberTests,
+    MultiSensorTests,
+    SwitchableTests,
+    TuyaDeviceTestCase,
 ):
     __test__ = True
 
@@ -30,6 +37,11 @@ class TestKoganSwitch(
         self.setUpForConfig("smartplugv1.yaml", KOGAN_SOCKET_PAYLOAD)
         self.subject = self.entities.get("switch")
         self.setUpSwitchable(SWITCH_DPS, self.subject)
+        self.setUpBasicBinarySensor(
+            OVERCURRENT_DPS,
+            self.entities.get("binary_sensor_overcurrent_alarm"),
+            device_class=BinarySensorDeviceClass.PROBLEM,
+        )
         self.setUpBasicNumber(
             TIMER_DPS,
             self.entities.get("number_timer"),
@@ -66,6 +78,7 @@ class TestKoganSwitch(
         )
         self.mark_secondary(
             [
+                "binary_sensor_overcurrent_alarm",
                 "number_timer",
                 "sensor_current",
                 "sensor_power",
@@ -75,22 +88,3 @@ class TestKoganSwitch(
 
     def test_device_class_is_outlet(self):
         self.assertEqual(self.subject.device_class, SwitchDeviceClass.OUTLET)
-
-    def test_current_power_w(self):
-        self.dps[POWER_DPS] = 1234
-        self.assertEqual(self.subject.current_power_w, 123.4)
-
-    def test_extra_state_attributes_set(self):
-        self.dps[TIMER_DPS] = 1
-        self.dps[VOLTAGE_DPS] = 2350
-        self.dps[CURRENT_DPS] = 1234
-        self.dps[POWER_DPS] = 5678
-        self.assertDictEqual(
-            self.subject.extra_state_attributes,
-            {
-                "timer": 1,
-                "current_a": 1.234,
-                "voltage_v": 235.0,
-                "current_power_w": 567.8,
-            },
-        )

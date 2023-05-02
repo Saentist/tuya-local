@@ -1,7 +1,7 @@
 from datetime import datetime
 from time import time
 from unittest import IsolatedAsyncioTestCase
-from unittest.mock import AsyncMock, Mock, call, patch
+from unittest.mock import AsyncMock, Mock, call, patch, ANY
 
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_STARTED,
@@ -9,6 +9,8 @@ from homeassistant.const import (
 )
 
 from custom_components.tuya_local.device import TuyaLocalDevice
+from custom_components.tuya_local.helpers.device_config import TuyaEntityConfig
+from custom_components.tuya_local.switch import TuyaLocalSwitch
 
 from .const import (
     EUROM_600_HEATER_PAYLOAD,
@@ -24,6 +26,8 @@ class TestDevice(IsolatedAsyncioTestCase):
         hass_patcher = patch("homeassistant.core.HomeAssistant")
         self.addCleanup(hass_patcher.stop)
         self.hass = hass_patcher.start()
+        self.hass().is_running = True
+        self.hass().is_stopping = False
 
         def job(func, *args):
             return func(*args)
@@ -45,6 +49,7 @@ class TestDevice(IsolatedAsyncioTestCase):
             "some.ip.address",
             "some_local_key",
             "auto",
+            None,
             self.hass(),
         )
         # For most tests we want the protocol working
@@ -383,7 +388,6 @@ class TestDevice(IsolatedAsyncioTestCase):
     def test_start_starts_when_ha_running(self):
         # Set up preconditions
         self.hass().is_running = True
-        self.hass().is_stopping = False
         listener = Mock()
         self.subject._startup_listener = listener
         self.subject.actually_start = Mock()
@@ -400,7 +404,6 @@ class TestDevice(IsolatedAsyncioTestCase):
     def test_start_schedules_for_later_when_ha_starting(self):
         # Set up preconditions
         self.hass().is_running = False
-        self.hass().is_stopping = False
         self.hass().bus.async_listen_once.return_value = "LISTENER"
         self.subject.actually_start = Mock()
 
@@ -474,6 +477,10 @@ class TestDevice(IsolatedAsyncioTestCase):
         self.subject._startup_listener = None
         self.subject.start = Mock()
         entity = AsyncMock()
+        entity._config = Mock()
+        entity._config.dps.return_value = []
+        # despite the name, the below HA function is not async and does not need to be awaited
+        entity.async_schedule_update_ha_state = Mock()
 
         # Call the function under test
         self.subject.register_entity(entity)
@@ -488,6 +495,8 @@ class TestDevice(IsolatedAsyncioTestCase):
         # Set up preconditions
         first = AsyncMock()
         second = AsyncMock()
+        second._config = Mock()
+        second._config.dps.return_value = []
         self.subject._children = [first]
         self.subject._running = True
         self.subject._startup_listener = None
@@ -506,6 +515,8 @@ class TestDevice(IsolatedAsyncioTestCase):
         # Set up preconditions
         first = AsyncMock()
         second = AsyncMock()
+        second._config = Mock()
+        second._config.dps.return_value = []
         self.subject._children = [first]
         self.subject._running = False
         self.subject._startup_listener = Mock()
@@ -563,7 +574,7 @@ class TestDevice(IsolatedAsyncioTestCase):
         self.mock_api().set_socketPersistent.assert_called_once_with(False)
         # Check that a full poll was done
         self.mock_api().status.assert_called_once()
-        self.assertDictEqual(result, {"1": "INIT", "2": 2})
+        self.assertDictEqual(result, {"1": "INIT", "2": 2, "full_poll": ANY})
         # Prepare for next round
         self.subject._cached_state = self.subject._cached_state | result
         self.mock_api().set_socketPersistent.reset_mock()
@@ -578,7 +589,7 @@ class TestDevice(IsolatedAsyncioTestCase):
         self.mock_api().status.assert_not_called()
         self.mock_api().heartbeat.assert_called_once()
         self.mock_api().receive.assert_called_once()
-        self.assertDictEqual(result, {"1": "UPDATED"})
+        self.assertDictEqual(result, {"1": "UPDATED", "full_poll": ANY})
         # Check that the connection was made persistent now that data has been
         # returned
         self.mock_api().set_socketPersistent.assert_called_once_with(True)
@@ -590,7 +601,7 @@ class TestDevice(IsolatedAsyncioTestCase):
         print("getting last iteration...")
         try:
             result = await loop.__anext__()
-            self.assertTrue(False)
+            self.fail("Should have raised an exception to quit the loop")
         # Check that the loop terminated
         except StopAsyncIteration:
             pass

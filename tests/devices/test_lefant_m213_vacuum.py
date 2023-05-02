@@ -1,7 +1,9 @@
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.vacuum import (
     STATE_CLEANING,
     STATE_DOCKED,
     STATE_ERROR,
+    STATE_IDLE,
     STATE_RETURNING,
     VacuumEntityFeature,
 )
@@ -50,6 +52,7 @@ class TestLefantM213Vacuum(MultiSensorTests, TuyaDeviceTestCase):
                     "dps": TIME_DPS,
                     "name": "sensor_clean_time",
                     "unit": UnitOfTime.MINUTES,
+                    "device_class": SensorDeviceClass.DURATION,
                 },
             ],
         )
@@ -111,7 +114,7 @@ class TestLefantM213Vacuum(MultiSensorTests, TuyaDeviceTestCase):
         self.dps[STATUS_DPS] = "4"
         self.assertEqual(self.subject.state, STATE_RETURNING)
         self.dps[STATUS_DPS] = "7"
-        self.assertEqual(self.subject.state, STATE_DOCKED)
+        self.assertEqual(self.subject.state, STATE_IDLE)
         self.dps[STATUS_DPS] = "6"
         self.assertEqual(self.subject.state, STATE_CLEANING)
         self.dps[POWER_DPS] = False

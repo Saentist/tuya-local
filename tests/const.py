@@ -1533,3 +1533,68 @@ MOTION_LIGHT_PAYLOAD = {
     "105": 374,
     "106": False,
 }
+
+BLITZWOLF_BWSH2_PAYLOAD = {
+    "1": True,
+    "3": "grade1",
+    "6": "close",
+    "19": "cancel",
+}
+
+BCOM_CAMERA_PAYLOAD = {
+    "101": True,
+    "103": False,
+    "104": False,
+    "106": "1",
+    "108": "0",
+    "109": "64GB",
+    "110": 1,
+    "111": False,
+    "115": "",
+    "117": 0,
+    "136": "",
+    "150": True,
+    "151": "1",
+    "162": False,
+    "231": "",
+    "232": False,
+}
+
+GX_AROMA_PAYLOAD = {
+    "1": True,
+    "2": "high",
+    "3": "cancel",
+    "4": 0,
+    "5": True,
+    "6": "colour",
+    "8": "b9fff500ab46ff",
+    "9": 0,
+}
+
+MOEBOT_PAYLOAD = {
+    "6": 41,
+    "101": "MOWING",
+    "102": 0,
+    "103": "MOWER_LEAN",
+    "104": True,
+    "105": 8,
+    "106": 1343,
+    "114": "AutoMode",
+}
+
+TOMPD63LW_SOCKET_PAYLOAD = {
+    "1": 139470,
+    "6": "CHoAQgQADlwAAA==",
+    "9": 0,
+    "11": False,
+    "12": False,
+    "13": 0,
+    "16": True,
+    "19": "FSE-F723C46A04FC6C",
+    # "101": 275,
+    # "102": 170,
+    # "103": 40,
+    # "104": 30,
+    # "105": False,
+    # "106": False,
+}

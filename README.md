@@ -37,7 +37,13 @@ easier to set up using that as an alternative.
 
 Note that devices sometimes get firmware upgrades, or incompatible
 versions are sold under the same model name, so it is possible that
-the device will not work despite being listed.
+the device will not work despite being listed. 
+
+Battery powered devices such as door and window sensors, smoke alarms
+etc which do not use a hub will be impossible to support locally, due
+to the power management that they need to do to get acceptable battery
+life.  Currently hubs are also unsupported, but this is being worked
+on.
 
 A list of currently supported devices can be found in the [DEVICES.md](https://github.com/make-all/tuya-local/blob/main/DEVICES.md) file.
 
@@ -272,6 +278,11 @@ It may be possible to get useful readings by blocking the switch from accessing
 the internet, otherwise an integration sensor based on the Power sensor
 will need to be set up on the Home Assistant side, and the Energy sensor
 ignored.
+
+For the amount of consumed energy, it may be reasonable to use an additional
+helper - the [Riemann integral](https://www.home-assistant.io/integrations/integration/).
+Select `power` of switch as the sensor for it. The result of the integral will be
+calculated in `(k/M/G/T)W*h` and will correspond to the consumed energy.
 
 ## Kogan Kettle gotchas
 

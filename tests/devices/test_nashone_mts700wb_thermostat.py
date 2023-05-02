@@ -3,6 +3,7 @@ from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACMode,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import (
     UnitOfTime,
 )
@@ -14,7 +15,6 @@ from ..mixins.climate import TargetTemperatureTests
 from ..mixins.number import BasicNumberTests
 from ..mixins.select import BasicSelectTests
 from ..mixins.sensor import BasicSensorTests
-from ..mixins.switch import BasicSwitchTests
 from .base_device_tests import TuyaDeviceTestCase
 
 POWER_DPS = "1"
@@ -36,7 +36,6 @@ class TestNashoneMTS700WBThermostat(
     BasicNumberTests,
     BasicSelectTests,
     BasicSensorTests,
-    BasicSwitchTests,
     TargetTemperatureTests,
     TuyaDeviceTestCase,
 ):
@@ -76,12 +75,8 @@ class TestNashoneMTS700WBThermostat(
         self.setUpBasicSensor(
             COUNTDOWN_DPS,
             self.entities.get("sensor_timer"),
-            unit=UnitOfTime.MINUTES,
-            testdata=(600, 10.0),
-        )
-        self.setUpBasicSwitch(
-            RESET_DPS,
-            self.entities.get("switch_factory_reset"),
+            unit=UnitOfTime.SECONDS,
+            device_class=SensorDeviceClass.DURATION,
         )
         self.mark_secondary(
             [
@@ -89,7 +84,6 @@ class TestNashoneMTS700WBThermostat(
                 "number_calibration_offset",
                 "select_timer",
                 "sensor_timer",
-                "switch_factory_reset",
             ],
         )
 
@@ -163,4 +157,3 @@ class TestNashoneMTS700WBThermostat(
         self.assertEqual(self.basicNumber.icon, "mdi:arrow-collapse-up")
         self.assertEqual(self.basicSelect.icon, "mdi:timer")
         self.assertEqual(self.basicSensor.icon, "mdi:timer")
-        self.assertEqual(self.basicSwitch.icon, "mdi:cog-refresh")

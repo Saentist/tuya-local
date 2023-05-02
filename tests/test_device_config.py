@@ -3,6 +3,9 @@ from fuzzywuzzy import fuzz
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import MagicMock
 
+from homeassistant.components.sensor import SensorDeviceClass
+
+from custom_components.tuya_local.helpers.config import get_device_id
 from custom_components.tuya_local.helpers.device_config import (
     available_configs,
     get_config,
@@ -12,6 +15,7 @@ from custom_components.tuya_local.helpers.device_config import (
     TuyaDpsConfig,
     TuyaEntityConfig,
 )
+from custom_components.tuya_local.sensor import TuyaLocalSensor
 
 from .const import (
     GPPH_HEATER_PAYLOAD,
@@ -21,6 +25,10 @@ from .const import (
 KNOWN_DPS = {
     "binary_sensor": {"required": ["sensor"], "optional": []},
     "button": {"required": ["button"], "optional": []},
+    "camera": {
+        "required": [],
+        "optional": ["switch", "motion_enable", "snapshot", "record"],
+    },
     "climate": {
         "required": [],
         "optional": [
@@ -63,10 +71,11 @@ KNOWN_DPS = {
         "optional": ["color_mode", "color_temp", "rgbhsv"],
     },
     "lock": {
-        "required": [
-            {"or": ["lock", {"and": ["request_unlock", "approve_unlock"]}]},
-        ],
+        "required": [],
         "optional": [
+            "lock",
+            {"and": ["request_unlock", "approve_unlock"]},
+            {"and": ["request_intercom", "approve_intercom"]},
             "unlock_fingerprint",
             "unlock_password",
             "unlock_temp_pwd",
@@ -74,7 +83,6 @@ KNOWN_DPS = {
             "unlock_card",
             "unlock_app",
             "unlock_key",
-            {"and": ["request_intercom", "approve_intercom"]},
             "jammed",
         ],
     },
@@ -145,7 +153,7 @@ class TestDeviceConfig(IsolatedAsyncioTestCase):
                 condition["xor"], accounted, unaccounted, known, required
             )
         else:
-            self.assertTrue(False, f"Unrecognized condition {condition}")
+            self.fail(f"Unrecognized condition {condition}")
 
     def and_match(self, conditions, accounted, unaccounted, known, required):
         single_match = False
@@ -261,6 +269,22 @@ class TestDeviceConfig(IsolatedAsyncioTestCase):
                     f"Probable typo {attr} is too similar to {dp} in {cfg} {e}",
                 )
 
+        # Check that sensors with mapped values are of class enum and vice versa
+        if entity.entity == "sensor":
+            mock_device = MagicMock()
+            sensor = TuyaLocalSensor(mock_device, entity)
+            if sensor.options:
+                self.assertEqual(
+                    entity.device_class,
+                    SensorDeviceClass.ENUM,
+                    f"{cfg} {e} has mapped values but does not have a device class of enum",
+                )
+            if entity.device_class == SensorDeviceClass.ENUM:
+                self.assertIsNotNone(
+                    sensor.options,
+                    f"{cfg} {e} has a device class of enum, but has no mapped values",
+                )
+
     def test_config_files_parse(self):
         """
         All configs should be parsable and meet certain criteria
@@ -307,19 +331,19 @@ class TestDeviceConfig(IsolatedAsyncioTestCase):
     async def test_dps_async_set_readonly_value_fails(self):
         """Test that setting a readonly dps fails."""
         mock_device = MagicMock()
-        cfg = get_config("kogan_switch")
-        voltage = cfg.primary_entity.find_dps("voltage_v")
+        cfg = get_config("goldair_gpph_heater")
+        error_code = cfg.primary_entity.find_dps("error")
         with self.assertRaises(TypeError):
-            await voltage.async_set_value(mock_device, 230)
+            await error_code.async_set_value(mock_device, 1)
 
     def test_dps_values_returns_none_with_no_mapping(self):
         """
         Test that a dps with no mapping returns None as its possible values
         """
         mock_device = MagicMock()
-        cfg = get_config("kogan_switch")
-        voltage = cfg.primary_entity.find_dps("voltage_v")
-        self.assertIsNone(voltage.values(mock_device))
+        cfg = get_config("goldair_gpph_heater")
+        temp = cfg.primary_entity.find_dps("current_temperature")
+        self.assertIsNone(temp.values(mock_device))
 
     def test_config_returned(self):
         """Test that config file is returned by config"""
@@ -433,6 +457,12 @@ class TestDeviceConfig(IsolatedAsyncioTestCase):
             cfg.values(mock_device),
             ["unmirrored", "map_one", "map_two"],
         )
+
+    def test_get_device_id(self):
+        """Test that check if device id is correct"""
+        self.assertEqual("my-device-id", get_device_id({"device_id": "my-device-id"}))
+        self.assertEqual("sub-id", get_device_id({"device_cid": "sub-id"}))
+        self.assertEqual("s", get_device_id({"device_id": "d", "device_cid": "s"}))
 
     # values gets very complex, with things like mappings within conditions
     # within mappings. I'd expect something like this was added with purpose,

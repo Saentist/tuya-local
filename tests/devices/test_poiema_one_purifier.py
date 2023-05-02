@@ -12,7 +12,7 @@ from ..mixins.button import BasicButtonTests
 from ..mixins.lock import BasicLockTests
 from ..mixins.select import BasicSelectTests
 from ..mixins.sensor import MultiSensorTests
-from ..mixins.switch import BasicSwitchTests, SwitchableTests
+from ..mixins.switch import SwitchableTests
 from .base_device_tests import TuyaDeviceTestCase
 
 SWITCH_DPS = "1"
@@ -29,7 +29,6 @@ class TestPoeimaOnePurifier(
     BasicButtonTests,
     BasicLockTests,
     BasicSelectTests,
-    BasicSwitchTests,
     MultiSensorTests,
     SwitchableTests,
     TuyaDeviceTestCase,
@@ -58,7 +57,6 @@ class TestPoeimaOnePurifier(
                 "5h": "5 hours",
             },
         )
-        self.setUpBasicSwitch(RESET_DPS, self.entities.get("switch_filter_reset"))
         self.setUpMultiSensors(
             [
                 {
@@ -72,6 +70,7 @@ class TestPoeimaOnePurifier(
                     "dps": COUNTDOWN_DPS,
                     "name": "sensor_timer",
                     "unit": UnitOfTime.MINUTES,
+                    "device_class": SensorDeviceClass.DURATION,
                 },
             ]
         )
@@ -79,7 +78,6 @@ class TestPoeimaOnePurifier(
             [
                 "button_filter_reset",
                 "lock_child_lock",
-                "switch_filter_reset",
                 "select_timer",
                 "sensor_timer",
             ]

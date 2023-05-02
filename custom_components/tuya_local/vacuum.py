@@ -4,10 +4,13 @@ Setup for different kinds of Tuya vacuum cleaners
 from homeassistant.components.vacuum import (
     SERVICE_CLEAN_SPOT,
     SERVICE_RETURN_TO_BASE,
+    SERVICE_STOP,
     STATE_CLEANING,
     STATE_DOCKED,
-    STATE_RETURNING,
     STATE_ERROR,
+    STATE_IDLE,
+    STATE_PAUSED,
+    STATE_RETURNING,
     StateVacuumEntity,
     VacuumEntityFeature,
 )
@@ -67,8 +70,6 @@ class TuyaLocalVacuum(TuyaLocalEntity, StateVacuumEntity):
             support |= VacuumEntityFeature.FAN_SPEED
         if self._power_dps:
             support |= VacuumEntityFeature.TURN_ON | VacuumEntityFeature.TURN_OFF
-        if self._active_dps:
-            support |= VacuumEntityFeature.START | VacuumEntityFeature.PAUSE
         if self._locate_dps:
             support |= VacuumEntityFeature.LOCATE
 
@@ -78,6 +79,17 @@ class TuyaLocalVacuum(TuyaLocalEntity, StateVacuumEntity):
             support |= VacuumEntityFeature.RETURN_HOME
         if SERVICE_CLEAN_SPOT in cmd_support:
             support |= VacuumEntityFeature.CLEAN_SPOT
+        if SERVICE_STOP in cmd_support:
+            support |= VacuumEntityFeature.STOP
+
+        if self._active_dps:
+            support |= VacuumEntityFeature.START | VacuumEntityFeature.PAUSE
+        else:
+            if "start" in cmd_support:
+                support |= VacuumEntityFeature.START
+            if "pause" in cmd_support:
+                support |= VacuumEntityFeature.PAUSE
+
         return support
 
     @property
@@ -95,15 +107,19 @@ class TuyaLocalVacuum(TuyaLocalEntity, StateVacuumEntity):
     def state(self):
         """Return the state of the vacuum cleaner."""
         status = self.status
-        if self._error_dps and self._error_dps.get_value(self._device) != 0:
+        if self._error_dps and self._error_dps.get_value(self._device):
             return STATE_ERROR
         elif status in [SERVICE_RETURN_TO_BASE, "returning"]:
             return STATE_RETURNING
-        elif status in ["standby", "charging"]:
+        elif status == "standby":
+            return STATE_IDLE
+        elif status == "paused":
+            return STATE_PAUSED
+        elif status in ["charging", "charged"]:
             return STATE_DOCKED
-        elif self._power_dps and not self._power_dps.get_value(self._device):
+        elif self._power_dps and self._power_dps.get_value(self._device) is False:
             return STATE_DOCKED
-        elif self._active_dps and not self._active_dps.get_value(self._device):
+        elif self._active_dps and self._active_dps.get_value(self._device) is False:
             return STATE_DOCKED
         else:
             return STATE_CLEANING
@@ -130,11 +146,19 @@ class TuyaLocalVacuum(TuyaLocalEntity, StateVacuumEntity):
     async def async_start(self):
         if self._active_dps:
             await self._active_dps.async_set_value(self._device, True)
+        else:
+            dps = self._command_dps or self._status_dps
+            if "start" in dps.values(self._device):
+                await dps.async_set_value(self._device, "start")
 
     async def async_pause(self):
         """Pause the vacuum cleaner."""
         if self._active_dps:
             await self._active_dps.async_set_value(self._device, False)
+        else:
+            dps = self._command_dps or self._status_dps
+            if "pause" in dps.values(self._device):
+                await dps.async_set_value(self._device, "pause")
 
     async def async_return_to_base(self, **kwargs):
         """Tell the vacuum cleaner to return to its base."""
@@ -147,6 +171,12 @@ class TuyaLocalVacuum(TuyaLocalEntity, StateVacuumEntity):
         dps = self._command_dps or self._status_dps
         if dps and SERVICE_CLEAN_SPOT in dps.values(self._device):
             await dps.async_set_value(self._device, SERVICE_CLEAN_SPOT)
+
+    async def async_stop(self, **kwargs):
+        """Tell the vacuum cleaner to stop."""
+        dps = self._command_dps or self._status_dps
+        if dps and SERVICE_STOP in dps.values(self._device):
+            await dps.async_set_value(self._device, SERVICE_STOP)
 
     async def async_locate(self, **kwargs):
         """Locate the vacuum cleaner."""

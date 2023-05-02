@@ -144,7 +144,10 @@ to use a secondary entity for that.
 
 A boolean setting to mark attributes as readonly. If not specified, the
 default is `false`.  If set to `true`, the attributes will be reported
-to Home Assistant, but no functionality for setting them will be exposed.
+to Home Assistant, but attempting to set them will result in an error.
+This is only needed in contexts where it would normally be possible to set
+the value.  If you are creating a sensor entity, or adding an attribute of an
+entity which is inherently read-only, then you do not need to specify this.
 
 ### `optional`
 
@@ -154,6 +157,40 @@ A boolean setting to mark attributes as optional.  This allows a device to be
 matched even if it is not sending the dp at the time when adding a new device.
 It can also be used to match a range of devices that have variations in the extra
 attributes that are sent.
+
+### `persist`
+
+*Optional, default true.*
+
+Whether to persist the value if the device does not return it on every status
+refresh.  Some devices don't return every value on every status poll. In most
+cases, it is better to remember the previous value, but in some cases the
+dp is used to signal an event, so when it is next sent, it should trigger
+automations even if it is the same value as previously sent.  In that case 
+the value needs to go to null in between when the device is not sending it.
+
+### `force`
+
+*Optional, default false.*
+
+A boolean setting to mark dps as requiring an explicit update request
+to fetch.  Many energy monitoring smartplugs require this, without a
+explicit request to update them, such plugs will only return monitoring data
+rarely or never.  Devices can misbehave if this is used on dps that do not
+require it.  Use this only where needed, and generally only on read-only dps.
+
+### `precision`
+
+*Optional, default None.*
+
+For integer dps that are sensor values, the suggested precision for
+display in Home Assistant can be specified.  If unspecified, the Home
+Assistant will use the native precision, which is calculated based on
+the scale of the dp so as to provide distinct values with as few
+decimal places as possible. For example a scale of 3 will result in
+one decimal place by default, (values displayed as x.3, x.7 rather
+than x.33333333 and x.666666) but you could override that to 2 or 0
+with by specifying the precision explicitly.
 
 ### `mapping`
 
@@ -217,6 +254,11 @@ For base64 and hex types, this specifies how to decode the binary data (after he
 This is a container field, the contents of which should be a list consisting of `name`, `bytes` and `range` fields.  `range` is as described above.  `bytes` is the number of bytes for the field, which can be `1`, `2`, or `4`.  `name` is a name for the field, which will have special handling depending on
 the device type.
 
+### `mask`
+
+*Optional.*
+
+For base64 and hex types, this specifies how to extract a single numeric value from the binary data.  The value should be a hex bit mask (eg 00FF00 to extract the middle byte of a 3 byte value).  Unlike format, this does not require special handling in the entity platform, as only a single value is being extracted.
 
 ## Mapping Rules
 
@@ -357,29 +399,20 @@ pick a defaulttone to use to turn on the siren.
 
 ### `constraint`
 
-*Optional, always paired with `conditions`.*
+*Optional, always paired with `conditions`.  Default if unspecified is the current attribute*
 
 If a rule depends on an attribute other than the current one, then `constraint`
-can be used to specify the element that `conditions` applies to.
+can be used to specify the element that `conditions` applies to.  `constraint` can also refer back to the same attribute - this can be useful for specifying conditional mappings, for example to support two different variants of a device in a single config file, where the only difference is the way they represent enum attributes.
 
 ### `conditions`
 
-*Optional, always paired with `constraint.`*
+*Optional, usually paired with `constraint.`*
 
-Conditions defines a list of rules that are applied based on the `constraint`
-attribute. The contents are the same as Mapping Rules, but `dps_val` applies
-to the attribute specified by `constraint`. All others act on the current
-attribute as they would in the mapping.  Although conditions are specified
-within a mapping, they can also contain a `mapping` of their own to override
-that mapping.  These nested mappings are limited to simple `dps_val` to `value`
-substitutions, as more complex rules would quickly become too complex to
-manage.
+Conditions defines a list of rules that are applied based on the `constraint` attribute. The contents are the same as Mapping Rules, but `dps_val` applies to the attribute specified by `constraint`, and also can be a list of values to match as well rather than a single value.  All others act on the current attribute as they would in the mapping.  Although conditions are specified within a mapping, they can also contain a `mapping` of their own to override that mapping.  These nested mappings are limited to simple `dps_val` to `value` substitutions, as more complex rules would quickly become too complex to manage.
 
 When setting a dp which has conditions attached, the behaviour is slightly different depending on whether the constraint dp is readonly or not.
 
-For non-readonly constraints, the constraint dp will be set along with the
-target dp so that the first condition with a value matching the target value
-is met.
+For non-readonly constraints that specify a single dps_val, the constraint dp will be set along with the target dp so that the first condition with a value matching the target value is met.
 
 For readonly constraints, the condition must match the constraint dp's current value for anything to be set.
 
@@ -558,8 +591,6 @@ Humidifer can also cover dehumidifiers (use class to specify which).
 
 ### switch
 - **switch** (required, boolean): a dp to control the switch state.
-- **current_power_w** (optional, number): a dp that returns the current power consumption in watts.
-   This is a legacy attribute, for the HA Energy dashboard it is advisable to also provide a sensor entity linked to the same dp as well.
 
 ### vacuum
 - **status** (required, mapping of strings): a dp to report and control the status of the vacuum.

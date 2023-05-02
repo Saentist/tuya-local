@@ -11,14 +11,11 @@ primary_entity:
       type: integer
       unit: W
       class: measurement
+      force: true
       mapping:
         - scale: 10
     - id: 24
       name: calibration
-      type: integer
-      optional: true
-    - id: 52
-      name: maximum
       type: integer
       optional: true
     - id: 21
@@ -39,6 +36,7 @@ secondary_entities:
         type: integer
         name: sensor
         unit: mA
+        force: true
         class: measurement
       - id: 23
         type: integer
@@ -53,6 +51,7 @@ secondary_entities:
         type: integer
         name: sensor
         unit: V
+        force: true
         class: measurement
         mapping:
           - scale: 10
@@ -61,20 +60,39 @@ secondary_entities:
         name: calibration
         optional: true
   - entity: number
-    name: Maximum Standby Power
+    name: Maximum reactive power
     category: config
+    class: power_factor
     dps:
       - id: 51
+        type: integer
+        name: value
+        optional: true
+        unit: "%"
+        range:
+          min: 10
+          max: 100
+        mapping:
+          - dps_val: null
+            invalid: true
+  - entity: number
+    name: Maximum effective power
+    category: config
+    class: power
+    dps:
+      - id: 52
         type: integer
         name: value
         optional: true
         unit: W
         range:
           min: 0
-          max: 100
+          max: 150000
         mapping:
           - dps_val: null
+            invalid: true
           - scale: 10
+            step: 100
   - entity: sensor
     name: Energy
     category: diagnostic
@@ -100,6 +118,7 @@ secondary_entities:
         type: bitfield
         name: sensor
         optional: true
+        persist: false
         mapping:
           - dps_val: null
             value: false
