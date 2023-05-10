@@ -7,6 +7,7 @@ from homeassistant.components.light import (
     ATTR_COLOR_TEMP,
     ATTR_EFFECT,
     ATTR_RGBW_COLOR,
+    ATTR_WHITE,
     ColorMode,
     LightEntity,
     LightEntityFeature,
@@ -210,7 +211,20 @@ class TuyaLocalLight(TuyaLocalEntity, LightEntity):
         settings = {}
         color_mode = None
 
-        if self._color_temp_dps and ATTR_COLOR_TEMP in params:
+        if self._color_mode_dps and ATTR_WHITE in params:
+            if self.color_mode != ColorMode.WHITE:
+                color_mode = ColorMode.WHITE
+            if ATTR_BRIGHTNESS not in params and self._brightness_dps:
+                bright = params.get(ATTR_WHITE)
+                _LOGGER.debug(f"Setting brightness via WHITE parameter to {bright}")
+                settings = {
+                    **settings,
+                    **self._brightness_dps.get_values_to_set(
+                        self._device,
+                        bright,
+                    ),
+                }
+        elif self._color_temp_dps and ATTR_COLOR_TEMP in params:
             if self.color_mode != ColorMode.COLOR_TEMP:
                 color_mode = ColorMode.COLOR_TEMP
 
