@@ -2,7 +2,7 @@
 
 None of this would have been possible without some foundational discovery work to get me started:
 
-- [nicole-ashley](https://github.com/nicole-ashley)'s [homeassistant-goldair-climate](https://github.com/nicole-ashley/homeassistant-goldair-climate) was the starting point for expanding to non-Goldair devices as well.
+- [nicole-ashley](https://github.com/nicole-ashley)'s [homeassistant-goldair-climate](https://github.com/nicole-ashley/homeassistant-goldair-climate) was the starting point for this project to expand to non-Goldair devices as well.  Initial support for GPPH heaters, GPDH420 dehumidifiers and GCPF315 fans is based on the upstream Goldair integration. Nicole also contributed GPDH340 dehumidifier support.
 - [TarxBoy](https://github.com/TarxBoy)'s [investigation using codetheweb/tuyapi](https://github.com/codetheweb/tuyapi/issues/31) to figure out the correlation of the cryptic DPS states .
 - [sean6541](https://github.com/sean6541)'s [tuya-homeassistant](https://github.com/sean6541/tuya-homeassistant) library giving an example of integrating Tuya devices with Home Assistant.
 - [clach04](https://github.com/clach04)'s [python-tuya](https://github.com/clach04/python-tuya) library.
@@ -226,7 +226,7 @@ Further device support has been made with the assistance of users.  Please consi
 - [dhuddle](https://github.com/dhuddle) for assisting with support for Chanfok ceiling fan with light, Inkbird BBQ thermometer, Lepro lights (variant of RGBCW light without timer) and Yieryi pH meter.
 - [theshop35](https://github.com/theshop35) for assisting with support for CC curtains.
 - [blakadder](https://github.com/blakadder) for assisting with support for Ultonic K10 air fryer.
-- [szupi-ipuzs](https://github.com/szupi-ipuzs) for contributing support for desk lamps (Setti+ SL601) and Loratap relays.
+- [szupi-ipuzs](https://github.com/szupi-ipuzs) for contributing support for desk lamps (Setti+ SL601), Loratap relays, Brennenstuhl WFD3050P motion spotlights.
 - [MackoMici](https://github.com/MackoMici) for contributing support for GX aroma diffuser, which was merged with the YYM config.
 - [Die-Meester](https://github.com/Die-Meester) for contributing support for CBI Astute smart switches.
 - [ResteNarquois](https://github.com/ResteNarquois) for assisting with support for Zemismart roller shades.
@@ -270,3 +270,6 @@ Further device support has been made with the assistance of users.  Please consi
 - [LesTR](https://github.com/LesTR) for early assistance with the subdevice support, and contribution of test improvements for subdevices.
 - [JonF-49](https://github.com/JonF-49) for contributing support for RGBW lightbulbs, and improvements to color light entities that lack color temperature control.
 - [charliesjc](https://github.com/charliesjc) for contributing support for CBI Astute smart controller breaker switches.
+- [stijnb1234](https://github.com/stijnb1234) for assisting with support for CCT lightbulbs.
+- [YodaDaCoda](https://github.com/YodaDaCoda) for contributing support for Kogan LX10 vacuum cleaners.
+- [itn3rd77](https://github.com/itn3rd77) for contributing support for Stadler Form Karl/Karl Big humidifiers.
