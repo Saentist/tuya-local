@@ -26,15 +26,15 @@ primary_entity:
       type: string
       mapping:
         - dps_val: manual
-          value: Manual
+          value: normal
         - dps_val: auto
-          value: Auto
+          value: auto
         - dps_val: laundry
-          value: Laundry
+          value: laundry
           icon: "mdi:t-shirt-crew"
           icon_priority: 3
         - dps_val: purify
-          value: Purify
+          value: purify
     - id: 19
       type: bitfield
       name: error

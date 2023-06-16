@@ -41,11 +41,13 @@
 - ElectriQ EcoSilent 14HPW
 - Fersk Vind 2
 - Kogan 2.6kW portable air conditioner
+- Nedis ACMB1WT12 portable air conditioner
 - Rotenso Roni R35WI
 - Sendo air conditioner
 - Star-Light air conditioner
 - Tadiran Wind 65/3P
 - TroniTechnik Hellnar Klimagerät
+- Vivax Cool ACP-12CH35REWI
 
 ### Pool heaters / heatpumps
 
@@ -55,7 +57,7 @@
 - IPS Pro pool-systems heatpump (seems to match Fairland Inver-X as well)
 - Madimack Elite V3 pool heatpump
 - Madimack(model unknown) pool heatpump (seems to match Fairland IPH45 as well)
-- Poolex Silverline, Q-line and Vertigo heatpumps
+- Poolex Silverline, Q-7, Q-line and Vertigo heatpumps
 - Remora pool heatpump
 - W'eau pool heatpump (simple model and a more complex 13kW model)
 
@@ -67,6 +69,7 @@
 ### Water heaters
 
 - Hydrotherm Dynamic/X8 heat pump hot water systems
+- Thermex IF series V pro hot water systems.
 
 ### Thermostats
 
@@ -79,6 +82,7 @@
 - Beca BHT-6000/8000 floor heating thermostat
 - Beok TGR81 thermostat (also reported working with Myuet ME98, Avatto WT81/ME81)
 - Beok TOL47 thermostat
+- Beok TR8B thermostat
 - Beok TR9B thermostat _(rebadged as Vancoo and perhaps others)_
 - BHT-002-GALW thermostat _(rebadged as many different brands)_
 - ETOP-HP thermostat (CH7100)
@@ -111,6 +115,7 @@
 - Arlec 6 speed floor fan
 - Aspen ASP 200 fan
 - Atomi 52 inch ceiling fan
+- Carro PN-04F02D fan with dimmable light
 - Chanfok ceiling fan with cool/warm white dimmable light
 - Deta fan controller
 - Fanco Eco Silent Deluxe ceiling fan with LED light
@@ -134,6 +139,7 @@
 - Hosome air purifier
 - Lifubide X600 air purifier
 - Poiema One air purifier
+- Proscenic A8 air purifier
 - Renpho RP-AP001S air purifier
 - Stadler Form Roger air purifier
 - Tesla Pro and Mini air purifiers
@@ -192,6 +198,7 @@
 - Anko 1.7L smart kettle
 - Setti+ KT950W smart kettle
 - Inkbird iBBQ-4BW cooking probe thermometer
+- Inkbird iBBQ-4T cooking probe thermometer
 - Inkbird sous vide cooker (also supports Silvercrest sous vide sticks)
 - Kogan glass 1.7L smart kettle
 - Silvercrest 1.7L smart kettle
@@ -201,11 +208,13 @@
 
 - CBI Astute smart controller breaker switch
 - Compteur digital electric (single phase)
+- DTS238-7 3 phase smart meter
 - eMylo EAI-90 smart meter
+- PC311-TY 2 phase power clamp meter
 - PC321-TY 3 phase power clamp meter
 - PJ-1103 power clamp meter
 - SG600MD Smart Solar Inverter (also SG700MD, other SGxx0MD and SGxx0W models) sold under various brands
-- SmartMCB SMT006 energy meter
+- SmartMCB SMT006 energy meter (10 byte and 8 byte phase info variants)
 - Taxnele circuit breaker and energy meter
 - TOMPD-63LW energy meter circuit breaker
 - WDYK 2P63A energy meter
@@ -242,11 +251,13 @@ the best option.
 - Grid Connect double outlet wall socket
 - Grid Connect double outlet with Energy Monitoring, Master and Individual switches and Child Lock
 - Grid Connect USB charger with power socket
+- Linkoze LKWSW201 dual button
 - Logicom Strippy 4 way power strip with USB
 - Loratap RR400W-V2 relay switch
 - Mirabella Genio smartplug with USB
 - Moes 3-gang switch
 - MoesHouse smartplug with RGBW nightlight
+- Novadigital 4-way switch with backlight, power on state and timers
 - Qnect QN-WPO3 3 outlet + USB powerstrip with individual timers
 - Single switch with backlight (unbranded)
 - Somgam single wall switch
@@ -285,6 +296,7 @@ of device.
 - Simple switch with timer v2 - the above with timer moved from dp 11 to 9, confirmed with a Nexxt 220V smart switch.
 - Simple triple switch - three switches in a single device, tested with Somgam 3 gang wall switches.
 - Simple quad switch - four switches in a single device, tested with Somgam 4 gang wall switches.
+- Simple 6-way switch - six switches in a single device
 - RGB Nightlight outlet - one smartplug with a small built-in RGB light.
 
 ### Lights
@@ -298,8 +310,12 @@ of device.
 - Deta/Arlec motion sensor lights (DET100HA/DET102HA/MAL315HA)
 - Deta 6910HA series2 dimmer switch
 - Dual-mode magic light string controller
+- Feit dimmer (may work with other brands that just have a switch, dimmer and
+  optional minimum brightness and bulb type)
+- Galaxy Projector
 - HDMI sync light
 - iHD001 LED controller
+- Lytmi Fantasy/Neo 3 HDMI sync backlight
 - Moes dimmer switch
 - Moes motion sensor lights (XZ-CGV3)
 - Space Dog Music Lamp
@@ -307,7 +323,7 @@ of device.
 ### Covers
 
 - Simple garage door
-- Simple blind controller
+- Simple blind controller (two variants - `simple_blinds` lets the position be set, but does not trust it to accurately reflect the current position always, `position_blinds` does trust the position to accurately reflect the current position)
 - Abalon BCM700D curtain motor (likely to work with other brands)
 - Avatto curtain and light switch
 - Avatto curtain switch
@@ -317,6 +333,7 @@ of device.
 - CC curtain controller 1
 - Dongguan garage door
 - Dooya curtain motor
+- Etersky curtain switch with backlight and timing control
 - FS-03W curtain switch with backlight control
 - Kogan garage door with tilt sensor
 - Loonas smart curtain
@@ -368,7 +385,7 @@ of device.
 - Brennenstuhl WFD3050P PIR motion activated CCT spotlight
 - Bresser smart 7-in-1 weather station
 - Catit Pixi smart fountain
-- Catit pet feeder (2.2kg dispenser and 6 meal versions)
+- Catit pet feeder (Pixi 2.2kg dispenser and 6 meal versions, and another non-Pixi branded single dispenser)
 - Emax EM3378 Weather Station (selling as Hiper P1 and other rebrands)
 - Inkbird PTH-9CW air quality monitor
 - KKMoon 7in1 air quality monitor
@@ -376,6 +393,7 @@ of device.
 - Konlen/Rockson WF96L water level controller
 - Nedis pet feeder
 - Nedis WIFISA10CWT air quality monitor
+- Petlibro PLAF203 camera pet feeder
 - PGST PA-010 indoor temperature and humidity sensor
 - PH-W218 water quality monitor
 - Rojeco PTM-001 pet feeder
@@ -384,14 +402,17 @@ of device.
 - SH07-8 smart sprinkler controller
 - Universal remote control (supports sensors only)
 - Yieryi water quality monitor (also matches unbranded PH-W3988 device)
+- ZN-2C09 9-in-1 air quality monitor
 - ZX-G30 alarm system (not as an alarm_control_panel, as individual inputs and sensors)
 - ZY-M100-WiFi mmWave human presence sensor
 
 ### Devices supported via Bluetooth hubs
 
-- PT216/PT19DB-2 temperature and humidity sensor
+- Adaprox Fingerbot plus
 - HCT-611 water timer
+- Johgee water timer
 - Orion DL021HA lock
+- PT216/PT19DB-2 temperature and humidity sensor
 
 ### Devices supported via IR hubs
 
@@ -401,7 +422,7 @@ of device.
 ### Devices supported via Zigbee hubs
 
 - LoraTap SC500ZB-V2 curtain controller
-
+- ZTH08ZTU temperature and humidity sensor
 
 NOTE: this project does not intend to expand the scope to support non-Tuya
 devices via Tuya hubs.  Though it may be techincally feasible to do such a
